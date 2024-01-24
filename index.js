@@ -1,5 +1,6 @@
 const sanitizeHtml = require("sanitize-html");
 const cheerio = require("cheerio");
+const fs = require("fs");
 // import { stringsToTest } from "./testHtmlStrings";
 const testHtmlStrings = require("./testHtmlStrings.js");
 
@@ -62,7 +63,7 @@ function cleanHtml(htmlString) {
   return cleanedHtml;
 }
 
-// function extractTagsAndAttributes(htmlArray) {
+// function extractTagsAndAttributesFromArray(htmlArray) {
 //   const result = {};
 
 //   htmlArray.forEach((htmlString) => {
@@ -70,108 +71,194 @@ function cleanHtml(htmlString) {
 
 //     $("*").each(function () {
 //       const tagName = $(this).get(0).tagName;
-//       const attributes = $(this).attr();
 
 //       if (!result[tagName]) {
-//         result[tagName] = {};
+//         result[tagName] = new Set();
 //       }
 
+//       const attributes = $(this).attr();
 //       for (let attr in attributes) {
-//         if (attr === "style") {
-//           if (!result[tagName][attr]) {
-//             result[tagName][attr] = {};
-//           }
-
-//           const styleString = attributes[attr];
-//           styleString.split(";").forEach((style) => {
-//             const [key, value] = style.split(":");
-//             if (key && value) {
-//               result[tagName][attr][key.trim()] = true;
-//             }
-//           });
-//         } else {
-//           result[tagName][attr] = true;
-//         }
+//         result[tagName].add(attr);
 //       }
 //     });
 //   });
 
+//   // Convert Sets to Arrays
+//   for (let tag in result) {
+//     result[tag] = Array.from(result[tag]);
+//   }
+
 //   return result;
 // }
 
-function extractTagsAndAttributesFromArray(htmlArray) {
-  const result = {};
+// const output = extractTagsAndAttributes(htmlArray);
+// const output = extractTagsAndAttributesFromArray([
+//   Object.values(testHtmlStrings)[Object.values(testHtmlStrings).length - 1],
+// ]);
+// const tagsAndAttributes = Object.entries(output)
+//   .filter(([tag, attrs]) => {
+//     return attrs.length > 0;
+//   })
+//   .reduce((acc, [tag, attrs]) => {
+//     acc[tag] = attrs;
+//     return acc;
+//   }, {});
 
-  htmlArray.forEach((htmlString) => {
-    const $ = cheerio.load(htmlString);
+// console.log(tagsAndAttributes);
 
-    $("*").each(function () {
-      const tagName = $(this).get(0).tagName;
+// function generateSanitizerConfig(htmlString) {
+//   const $ = cheerio.load(htmlString);
+//   const config = {
+//     allowedTags: [],
+//     selfClosing: ["img", "br"],
+//     allowedAttributes: {},
+//     allowedStyles: {},
+//   };
 
-      if (!result[tagName]) {
-        result[tagName] = new Set();
-      }
+//   $("*").each(function () {
+//     const tagName = $(this).get(0).tagName;
 
+//     // Add tag to allowedTags if not already present
+//     if (!config.allowedTags.includes(tagName)) {
+//       config.allowedTags.push(tagName);
+//     }
+
+//     // Process attributes
+//     const attributes = $(this).attr();
+//     for (let attr in attributes) {
+//       if (!config.allowedAttributes[tagName]) {
+//         config.allowedAttributes[tagName] = [];
+//       }
+//       if (!config.allowedAttributes[tagName].includes(attr)) {
+//         config.allowedAttributes[tagName].push(attr);
+//       }
+
+//       // Process styles if the attribute is 'style'
+//       if (attr === "style") {
+//         const styleString = attributes[attr];
+//         if (!config.allowedStyles[tagName]) {
+//           config.allowedStyles[tagName] = {};
+//         }
+
+//         styleString.split(";").forEach((style) => {
+//           const [key, _] = style.split(":");
+//           if (key && !config.allowedStyles[tagName][key.trim()]) {
+//             config.allowedStyles[tagName][key.trim()] = true;
+//           }
+//         });
+//       }
+//     }
+//   });
+
+//   // Finalize allowedStyles by converting true to arrays
+//   for (let tag in config.allowedStyles) {
+//     config.allowedStyles[tag] = Object.keys(config.allowedStyles[tag]);
+//   }
+
+//   return config;
+// }
+
+// Example usage
+// const htmlString = `...`; // Your HTML string here
+const lastString =
+  Object.values(testHtmlStrings)[Object.values(testHtmlStrings).length - 1];
+// const sanitizerConfig = generateSanitizerConfig(lastString);
+// console.log(sanitizerConfig);
+
+function generateSanitizerConfig(htmlString, baseConfig) {
+  const $ = cheerio.load(htmlString);
+
+  $("*").each(function () {
+    const tagName = $(this).get(0).tagName;
+
+    // Add tag to allowedTags if not already present and if it's in the baseConfig
+    if (baseConfig.allowedTags.includes(tagName)) {
       const attributes = $(this).attr();
       for (let attr in attributes) {
-        result[tagName].add(attr);
+        if (
+          baseConfig.allowedAttributes[tagName] &&
+          !baseConfig.allowedAttributes[tagName].includes(attr)
+        ) {
+          baseConfig.allowedAttributes[tagName].push(attr);
+        }
+
+        // Process styles if the attribute is 'style' and the tag is in allowedStyles
+        if (attr === "style" && baseConfig.allowedStyles[tagName]) {
+          const styleString = attributes[attr];
+          styleString.split(";").forEach((style) => {
+            const [key, value] = style.split(":");
+            if (key && value) {
+              const trimmedKey = key.trim();
+              if (!baseConfig.allowedStyles[tagName][trimmedKey]) {
+                baseConfig.allowedStyles[tagName][trimmedKey] = [/^.*$/]; // Allow all values for this style
+              }
+            }
+          });
+        }
       }
-    });
+    }
   });
 
-  // Convert Sets to Arrays
-  for (let tag in result) {
-    result[tag] = Array.from(result[tag]);
-  }
-
-  return result;
+  return baseConfig;
 }
+
 // Example usage
-const htmlArray = [
-  `<p class="tde-paragraph" dir="ltr" style="text-align: center">
-     <strong
-         class="tde-text-bold"
-         style="
-           background-color: rgb(0, 0, 0);
-           color: rgb(0, 0, 0);
-           font-family: Arial, sans-serif;
-           font-weight: 700;
-           font-size: 13pt;
-           text-decoration: none;
-           white-space: pre-wrap;
-         "
-         >FIRST IMPRESSIONS: Start Strong!</strong
-       >
-   </p>`,
-];
+// const htmlString = `...`; // Your HTML string here
 
-// const output = extractTagsAndAttributes(htmlArray);
-const output = extractTagsAndAttributesFromArray([
-  Object.values(testHtmlStrings)[Object.values(testHtmlStrings).length - 1],
-]);
-const tagsAndAttributes = Object.entries(output)
-  .filter(([tag, attrs]) => {
-    return attrs.length > 0;
-  })
-  .reduce((acc, [tag, attrs]) => {
-    acc[tag] = attrs;
-    return acc;
-  }, {});
+const baseConfig = {
+  allowedTags: [
+    "a",
+    "ol",
+    "ul",
+    "li",
+    "em",
+    "div",
+    "span",
+    "strong",
+    "p",
+    "img",
+    "b",
+  ],
+  selfClosing: ["br", "img"],
+  allowedAttributes: {
+    p: ["style", "class"],
+    a: ["rel", "href", "target"],
+    div: ["style"],
+    span: ["style"],
+    img: [
+      "data-*",
+      "src",
+      "style",
+      "alt",
+      "class",
+      "height",
+      "width",
+      "vertical-align",
+      "display",
+    ],
+  },
+  allowedStyles: {
+    p: { "text-align": [/.*/], color: [/^blue$/] },
+    div: { "text-align": [/^justify$/] },
+    span: {
+      "font-size": [/^\d+\.?\d*(?:px|rem|em|%)$/],
+      "text-decoration": [/^underline$/],
+    },
+    img: { "vertical-align": [/.*/], height: [/.*/], width: [/.*/] },
+  },
+};
 
-console.log(tagsAndAttributes);
-// console.log(output);
-
-// Example usage:
-// const htmlString = `<p class=\"tde-paragraph\" style=\"text-align: center;
-// background-color: transparent;
-// color: red;
-// font-family: Georgia, serif;\"
-// ><img src=\"https://cloud.toddleapp.com/thumber/fit-in/1080x1080/https://cloud.toddleapp.com/eu-west-1/p/_oaXnWM/content/rt/uploads/YYpe9DmMuz/HUK7yXdNz.png\" height=\"96\" width=\"931\" alt=\"18924_3.png\" style=\"display: inline;\"></p>
-// <p class=\"tde-paragraph\" dir=\"ltr\">
-// <h3 class=\"tde-heading-h3\" dir=\"ltr\" style=\"text-align: center;\"><span style=\"background-color: transparent; color: rgb(32, 33, 34); font-family: Georgia, serif; font-weight: 400; font-size: 20pt; text-decoration: none; white-space: pre-wrap;\">Oil spill near Black Sea as storm sinks three  ships</span></h3>
-// </p>
-// `;
-
-// const cleanedHtml = cleanHtml(htmlString);
-// console.log(cleanedHtml);
-// console.log(Object.values(testHtmlStrings)[0].length);
+const updatedConfig = generateSanitizerConfig(lastString, baseConfig);
+// console.log(updatedConfig);
+// Write the updated configuration to a file
+fs.writeFile(
+  "sanitizerConfig.json",
+  JSON.stringify(updatedConfig, null, 2),
+  (err) => {
+    if (err) {
+      console.error("Error writing file:", err);
+    } else {
+      console.log("Config written to sanitizerConfig.json");
+    }
+  }
+);
