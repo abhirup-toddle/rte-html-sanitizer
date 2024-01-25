@@ -40,7 +40,6 @@ function cleanHtml(htmlString) {
     allowedStyles: {
       p: {
         "text-align": [/.*/],
-        color: [/^blue$/],
       },
       div: {
         "text-align": [/^justify$/],

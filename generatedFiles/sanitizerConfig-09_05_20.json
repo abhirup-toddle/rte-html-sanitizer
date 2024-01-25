@@ -1,0 +1,93 @@
+{
+  "allowedTags": [
+    "a",
+    "ol",
+    "ul",
+    "li",
+    "em",
+    "div",
+    "span",
+    "strong",
+    "p",
+    "img",
+    "b"
+  ],
+  "selfClosing": [
+    "br",
+    "img"
+  ],
+  "allowedAttributes": {
+    "p": [
+      "style",
+      "class",
+      "dir",
+      "data-sessionid"
+    ],
+    "a": [
+      "rel",
+      "href",
+      "target",
+      "title",
+      "class"
+    ],
+    "div": [
+      "style"
+    ],
+    "span": [
+      "style",
+      "class"
+    ],
+    "img": [
+      "data-*",
+      "src",
+      "style",
+      "alt",
+      "class",
+      "height",
+      "width",
+      "vertical-align",
+      "display",
+      "data-latex"
+    ]
+  },
+  "allowedStyles": {
+    "p": {
+      "text-align": [
+        {}
+      ],
+      "color": [
+        {}
+      ]
+    },
+    "div": {
+      "text-align": [
+        {}
+      ]
+    },
+    "span": {
+      "font-size": [
+        {}
+      ],
+      "text-decoration": [
+        {}
+      ],
+      "white-space": [
+        {}
+      ]
+    },
+    "img": {
+      "vertical-align": [
+        {}
+      ],
+      "height": [
+        {}
+      ],
+      "width": [
+        {}
+      ],
+      "display": [
+        {}
+      ]
+    }
+  }
+}

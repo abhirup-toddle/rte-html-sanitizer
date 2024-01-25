@@ -1,0 +1,81 @@
+const config = {
+  allowedTags: [],
+  selfClosing: [],
+  allowedAttributes: {},
+  allowedStyles: {},
+};
+
+const currentExample = {
+  p: ["class", "dir", "data-sessionid", "style"],
+  span: ["style", "class"],
+  a: ["href", "title", "class", "rel"],
+  strong: ["class", "style"],
+  em: ["class", "style"],
+  img: ["src", "height", "width", "alt", "data-latex", "style"],
+  ul: ["class"],
+  li: ["value", "class", "dir", "style"],
+  ol: ["class"],
+};
+
+const desiredExample = {
+  p: ["class", "dir", "data-sessionid", "style"],
+  span: ["style", "class"],
+  a: ["href", "title", "class", "rel"],
+  strong: ["class", "style"],
+  em: ["class", "style"],
+  img: ["src", "height", "width", "alt", "data-latex", "style"],
+  ul: ["class"],
+  li: ["value", "class", "dir", "style"],
+  ol: ["class"],
+};
+
+const newConfig = {
+  allowedTags: [
+    "html",
+    "head",
+    "body",
+    "p",
+    "span",
+    "a",
+    "b",
+    "strong",
+    "i",
+    "em",
+    "img",
+    "br",
+    "ul",
+    "li",
+    "ol",
+    "u",
+  ],
+  selfClosing: ["img", "br"],
+  allowedAttributes: {
+    p: ["class", "dir", "data-sessionid", "style"],
+    span: ["style", "class"],
+    a: ["href", "title", "class", "rel"],
+    strong: ["class", "style"],
+    em: ["class", "style"],
+    img: [
+      "data-*",
+      "src",
+      "style",
+      "alt",
+      "class",
+      "height",
+      "width",
+      "vertical-align",
+      "display",
+    ],
+    ul: ["class", "dir", "data-sessionid", "style"],
+    ol: ["class", "dir", "data-sessionid", "style"],
+    li: ["value", "class", "dir", "style"],
+  },
+  allowedStyles: {
+    span: ["white-space", "font-size"],
+    strong: ["white-space"],
+    em: ["white-space"],
+    img: ["vertical-align", "height", "width", "display"],
+    p: ["text-align"],
+    li: ["text-align"],
+  },
+};

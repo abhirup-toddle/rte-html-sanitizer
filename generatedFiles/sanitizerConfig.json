@@ -10,7 +10,8 @@
     "strong",
     "p",
     "img",
-    "b"
+    "b",
+    "i"
   ],
   "selfClosing": ["br", "img"],
   "allowedAttributes": {
@@ -29,7 +30,8 @@
       "vertical-align",
       "display",
       "data-latex"
-    ]
+    ],
+    "i": ["class"]
   },
   "allowedStyles": {
     "p": {
