@@ -1,9 +1,8 @@
 const sanitizeHtml = require("sanitize-html");
 const fs = require("fs");
-const c3 = require("./config/c3");
-const dataSet2 = require("./testData/dataSet2");
+const _config = require("../configs/config");
+const dataSet1 = require("../testData/set1");
 
-//to create a unique incremental number
 function getIncrementalNumber() {
   let i = 0;
   return function () {
@@ -50,12 +49,8 @@ function writeHtmlStringsToFile(cleanedHtmlStrings) {
 }
 
 function convertHtmlStringArrayToHtmlFile(htmlStringArray) {
-  const _htmlStringArray = cleanHtmlStrings(htmlStringArray, c3);
+  const _htmlStringArray = cleanHtmlStrings(htmlStringArray, _config);
   writeHtmlStringsToFile(_htmlStringArray);
 }
 
-convertHtmlStringArrayToHtmlFile(dataSet2);
-
-// // writeHtmlFile(cleanedHtml);
-// const firstTwo = dataSet2.slice(0, 2);
-// writeHtmlFiles(dataSet2, newConfig);
+convertHtmlStringArrayToHtmlFile(dataSet1);
