@@ -1,9 +1,9 @@
 const sanitizeHtml = require("sanitize-html");
 const cheerio = require("cheerio");
 const fs = require("fs");
-const baseConfig = require("./baseConfig");
+const baseConfig = require("./config/baseConfig.js");
 const htmlSample = require("./testData/sampleHtml2.js");
-const newConfig = require("./generatedFiles/newConfig.js");
+const newConfig = require("./config/newConfig.js");
 const newTestString = require("./testData/newTestString.js");
 
 // console.log(newTestString.length);
