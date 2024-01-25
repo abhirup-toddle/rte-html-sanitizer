@@ -1,18 +1,30 @@
 const sanitizeHtml = require("sanitize-html");
 const fs = require("fs");
-const newConfig = require("./config/newConfig");
 const c3 = require("./config/c3");
 const dataSet2 = require("./testData/dataSet2");
-const {
-  cleanHtml,
-  writeHtmlFile,
-  getIncrementalNumber,
-  getTimestamp,
-} = require("./cleanHtml2");
 
+//to create a unique incremental number
+function getIncrementalNumber() {
+  let i = 0;
+  return function () {
+    return i++;
+  };
+}
 const _num = getIncrementalNumber();
 
-//create a function that will take in an array of html strings and return an array of cleaned html strings
+function getTimestamp() {
+  return new Date()
+    .toISOString()
+    .split("T")[1]
+    .split(".")[0]
+    .replace(/:/g, "_");
+}
+
+function cleanHtml(htmlString, config) {
+  const cleanedHtml = sanitizeHtml(htmlString, config);
+  return cleanedHtml;
+}
+
 function cleanHtmlStrings(htmlStrings, config) {
   const cleanedHtmlStrings = htmlStrings.map((htmlString) => {
     return cleanHtml(htmlString, config);
@@ -21,7 +33,6 @@ function cleanHtmlStrings(htmlStrings, config) {
 }
 
 function writeHtmlStringsToFile(cleanedHtmlStrings) {
-  // Format the array as a JavaScript array assignment
   const fileName = `output-${getTimestamp()}.js`;
   const jsContent = `export const strings = ${JSON.stringify(
     cleanedHtmlStrings,
@@ -37,6 +48,7 @@ function writeHtmlStringsToFile(cleanedHtmlStrings) {
     }
   });
 }
+
 function convertHtmlStringArrayToHtmlFile(htmlStringArray) {
   const _htmlStringArray = cleanHtmlStrings(htmlStringArray, c3);
   writeHtmlStringsToFile(_htmlStringArray);
