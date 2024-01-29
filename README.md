@@ -4,7 +4,7 @@
 
 The purpose of this project is to clean up historical RTE data and ensure that only supported tags and attributes are allowed.
 
-To run the project, refer to the index.js file. This utilizes sanitize-html along with a curated config object (contained in the file itself).
+The index.js file contains everything is required to run the clean up. This utilizes sanitize-html along with a custom config object. This function will return the cleaned html string. This has to be run on each existing html string in the database.
 
 ## Additional Notes
 
