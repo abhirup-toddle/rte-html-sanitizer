@@ -53,4 +53,6 @@ function convertHtmlStringArrayToHtmlFile(htmlStringArray) {
   writeHtmlStringsToFile(_htmlStringArray);
 }
 
-convertHtmlStringArrayToHtmlFile(dataSet1);
+// convertHtmlStringArrayToHtmlFile(dataSet1);
+
+module.exports = convertHtmlStringArrayToHtmlFile;
